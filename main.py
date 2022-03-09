@@ -7,22 +7,24 @@ import numpy as np
 import seaborn as sb
 from queue import PriorityQueue 
 import math
+import os
 
+cost_file_path = os.path.join(os.path.dirname(__file__), "Cost.json")
 #To Set The File's in your own folder
 #Load all the data set using json.load
-with open(r'C:\Users\eric2\Desktop\CZ3005Lab\Cost.json') as dataCost:
-    dataCostLoad = json.load(dataCost)
-    
+dataCostLoad = json.load(open(cost_file_path))
+#with open(r'C:\Users\eric2\Desktop\CZ3005Lab\Cost.json') as dataCost:
+#    dataCostLoad = json.load(dataCost)
 
-with open(r'C:\Users\eric2\Desktop\CZ3005Lab\Coord.json') as dataCoord:
-    dataCoordLoad = json.load(dataCoord)
+coord_file_path = os.path.join(os.path.dirname(__file__), "Coord.json")
+dataCoordLoad = json.load(open(coord_file_path))
 
+dist_file_path = os.path.join(os.path.dirname(__file__), "Dist.json")
+dataDistLoad = json.load(open(dist_file_path))
 
-with open(r'C:\Users\eric2\Desktop\CZ3005Lab\Dist.json') as dataDist:
-    dataDistLoad = json.load(dataDist)
+g_file_path = os.path.join(os.path.dirname(__file__), "G.json")
+dataGLoad = json.load(open(g_file_path))
 
-with open(r'C:\Users\eric2\Desktop\CZ3005Lab\G.json') as dataG:
-    dataGLoad = json.load(dataG)
 
 #Task 2 and 3's Settings
 startNode = "1"
