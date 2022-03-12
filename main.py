@@ -2,9 +2,6 @@
 import json
 from os import stat
 from tracemalloc import start
-import pandas as pd
-import numpy as np 
-import seaborn as sb
 from queue import PriorityQueue 
 import math
 import os
@@ -46,7 +43,7 @@ print(type(dataCoordLoad))
 def ucs(startNode, endNode, adjGraph, distances): 
     #Backtracking Method to create develop a path 
     def backTrack(parent_dict, node):
-        path = [node]
+        path = []
         while parent_dict[node] is not None:
             node = parent_dict[node]
             path.append(node)
@@ -59,7 +56,7 @@ def ucs(startNode, endNode, adjGraph, distances):
     q = PriorityQueue()
     parent = {startNode: None}
     totalDist = {startNode : 0}
-    visited = set()
+    visited = set() #Use a set so that there won't be duplicates
     q.put((0,startNode))
 
 
@@ -92,8 +89,8 @@ def ucsBudget(startNode, endNode, adjGraph, distances, costs, budget):
     #Need a backtracking algorithm to find the root parent/path
     def backTrack(parent_dict, node_cost):
         #Retrieve tuple but only node is stored.
-        node,_ = node_cost
-        path = [node]
+        node,cost = node_cost
+        path = []
         #Method to trace back to each node's parent
         while parent_dict[node_cost] is not None:
             node_cost = parent_dict[node_cost]
@@ -105,7 +102,7 @@ def ucsBudget(startNode, endNode, adjGraph, distances, costs, budget):
     q = PriorityQueue()
     parent = {(startNode,0) : None} #Parent dictionary of the nodes
     totalDistance = {(startNode, 0) : 0} #calculate the total distance of the node
-    visited = set() #Create a visited set to see if node has been visited
+    visited = set() #Use a set so that there won't be duplicates to see if nodes are visited
     #Create a minimum cost and distance dictionary of each nodes
     minCost = {} 
     minDist = {} 
@@ -149,6 +146,78 @@ def ucsBudget(startNode, endNode, adjGraph, distances, costs, budget):
     return None,None,None
 
 
+def aStar(startNode, endNode, adjGraph, distances, costs, budget,coord):
+
+    #Need a backtracking algorithm to find the root parent/path
+    def backTrack(parent_dict, node_cost):
+        #Retrieve tuple but only node is stored.
+        node,cost = node_cost
+        path = []
+        #Method to trace back to each node's parent
+        while parent_dict[node_cost] is not None:
+            node_cost = parent_dict[node_cost]
+            node,_ = node_cost
+            path.append(node)
+        #Return the nodes path
+        return path 
+
+    #To find the shortest distance between one point to another by being allowed to move anywhere
+    #We can use Euclidean Distance Heuristics
+    def euclideanDist(nodeA,nodeB):
+        x1,y1 = coord[nodeA]
+        x2,y2 = coord[nodeB]
+        #
+        h = math.sqrt((x1-x2)**2 + (y1-y2)**2)
+        return h
+    
+    q = PriorityQueue()
+    parent = {(startNode,0) : None} #Parent dictionary of the nodes
+    totalDistance = {(startNode, 0) : 0} #calculate the total distance of the node
+    visited = set() #Create a visited set to see if node has been visited
+    #Create a minimum cost and distance dictionary of each nodes
+    minCost = {} 
+    minDist = {} 
+    q.put((0, (startNode, 0)))
+    while not q.empty():
+        (distance, (element,cost)) = q.get()
+        #Check if its in minCost or minDist
+
+        #Skip this element because it is already checked or its value its actually more than whatever that has been stored in minCost/minDist
+        if element in minDist and element in minCost and minDist[element] <= totalDistance[element,cost] and minCost[element] <= cost:
+            continue 
+
+        #If element is not in or we found out Minimum distance is actually more than the distance now. 
+        if element not in minDist or minDist[element] > totalDistance[element,cost]:
+            minDist[element] = totalDistance[element,cost]
+        
+        # If element in not in min cost and is the mincost is more than the current cost
+        if element not in minCost or minCost[element] > cost:
+            minCost[element] = cost
+        
+        #Add into visited to track what node has been explored
+        visited.add((element,cost))
+
+        #Check if final node has reached. Once reached call backTrack() to create the path.
+        if element == endNode:
+            path = backTrack(parent, (element,cost))
+            return path, totalDistance[element,cost], cost
+
+        #You will check the adjacent nodes in the Graph, This will be the for loop that checks for every other neighbour of the node
+        for adjNode in adjGraph[element]:
+            nDistance = totalDistance[element,cost] + distances[element + "," + adjNode]
+            nCost = cost + costs[element + "," + adjNode]
+            currAdjNode = (adjNode,nCost)
+            if (currAdjNode not in visited and currAdjNode not in totalDistance and nCost <= budget):
+                #Add with euclidean distance instead of the distance dictionary
+                q.put((nDistance +min(distances[element+ "," + adjNode], euclideanDist(adjNode,endNode)) , currAdjNode))
+                #Update the totalDistance array
+                totalDistance[currAdjNode] = nDistance
+                #Update the parent array
+                parent[currAdjNode] = (element,cost)
+                            
+    return None,None,None
+
+
 #Task 1
 print ("=========================== Task 1 ================================\n")
 path,distance = ucs(startNode,endNode,dataGLoad,dataDistLoad)
@@ -173,7 +242,13 @@ print("Total Energy Cost: " , cost)
 
 print ("=========================== Task 3 ================================\n")
         
-
+path3,distance3,cost3 = aStar(startNode,endNode,dataGLoad,dataDistLoad,dataCostLoad,budget,dataCoordLoad)
+ans3 = str(path3.pop())
+while len(path3) > 0:
+    ans3 += "->" + (str(path3.pop()))
+print("Shortest Path: " , ans3)
+print("Shortest Distance: " , distance3) 
+print("Total Energy Cost: " , cost3)
 
 
 
