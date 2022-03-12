@@ -6,6 +6,7 @@ from queue import PriorityQueue
 import math
 import os
 
+#All files must be in the same folder for this to work
 cost_file_path = os.path.join(os.path.dirname(__file__), "Cost.json")
 #To Set The File's in your own folder
 #Load all the data set using json.load
