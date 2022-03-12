@@ -210,7 +210,7 @@ def aStar(startNode, endNode, adjGraph, distances, costs, budget,coord):
             currAdjNode = (adjNode,nCost)
             if (currAdjNode not in visited and currAdjNode not in totalDistance and nCost <= budget):
                 #Add with euclidean distance instead of the distance dictionary
-                q.put((nDistance +min(distances[element+ "," + adjNode], euclideanDist(adjNode,endNode)) , currAdjNode))
+                q.put((nDistance + euclideanDist(adjNode,endNode) , currAdjNode))
                 #Update the totalDistance array
                 totalDistance[currAdjNode] = nDistance
                 #Update the parent array
